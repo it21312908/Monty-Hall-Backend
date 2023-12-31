@@ -1,0 +1,43 @@
+using Microsoft.EntityFrameworkCore;
+using test_backend.Models;
+
+var builder = WebApplication.CreateBuilder(args);
+
+// Add services to the container.
+
+builder.Services.AddControllers();
+
+builder.Services.AddCors(options =>
+{
+	options.AddPolicy("AllowAllOrigins",
+		builder => builder
+			.AllowAnyOrigin()
+			.AllowAnyMethod()
+			.AllowAnyHeader());
+});
+
+// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+builder.Services.AddDbContext<MontyHallDbContext>(options =>
+options.UseSqlServer(builder.Configuration.GetConnectionString("DevConnection")));
+
+var app = builder.Build();
+
+// Configure the HTTP request pipeline.
+if (app.Environment.IsDevelopment())
+{
+	app.UseSwagger();
+	app.UseSwaggerUI();
+}
+
+app.UseHttpsRedirection();
+
+app.UseAuthorization();
+
+app.MapControllers();
+
+app.UseCors("AllowAllOrigins");
+
+app.Run();
